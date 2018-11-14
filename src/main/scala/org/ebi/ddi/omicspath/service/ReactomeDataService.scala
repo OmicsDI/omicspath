@@ -1,14 +1,11 @@
 package org.ebi.ddi.omicspath.service
 
 import java.text.SimpleDateFormat
-
-import jdk.nashorn.internal.parser.JSONParser
-import org.ebi.ddi.omicspath.model.PathwayDataModel
+import net.liftweb.json._
+import org.ebi.ddi.omicspath.model.{PathwayDataModel, PathwaySchemaDataModel}
 import org.ebi.ddi.omicspath.utils.Constants
 
-import scala.io._
-import upickle.default._
-import net.liftweb.json._
+
 /*
 * @author Gaurhari
 *
@@ -28,20 +25,26 @@ class ReactomeDataService extends DataService  {
     scala.io.Source.fromURL(Constants.REACTOME_ROOT_URL + "data/schema/Pathway/count").mkString
   }
 
+  /*
+  *get pathways id data from pages using start page number and page size
+  *
+  * @param pageNumber
+  * @param pageSize
+  * */
   def getPathwaysPagesId(pageNumber:String, pageSize: String): Array[PathwayDataModel] ={
 
     var json:Array[PathwayDataModel] = new Array[PathwayDataModel](pageSize.toInt);
 
-    val pathwayPage = Constants.REACTOME_ROOT_URL + "data/schema/Pathway"
+    val pathwayPage = Constants.PATHWAY_PAGE_URL
 
-    val r = requests.get(
+    val pathwaysIdList = requests.get(
       pathwayPage,
       params = Map("page" -> pageNumber, "offset" -> pageSize)
     )
 
-    if(r.statusCode.equals(200)) {
+    if(pathwaysIdList.statusCode.equals(200)) {
 
-      val jValue = parse(r.text)
+      val jValue = parse(pathwaysIdList.text)
 
       // create a Pathways object from the string
       json = jValue.extract[Array[PathwayDataModel]]
@@ -51,8 +54,27 @@ class ReactomeDataService extends DataService  {
     json
   }
 
-  def getPathwaysData(pathwayId:String)={
-  ""
+  /*
+  * get single pathway data by using its id
+  *
+  * @param pathwayId
+  * */
+  def getPathwaysData(pathwayId:String):PathwaySchemaDataModel={
+
+    var pathway:PathwaySchemaDataModel = null
+
+    val pathwayUrl = Constants.PATHWAY_ID_URL + pathwayId
+
+    val pathwayData = requests.get(
+      pathwayUrl
+    )
+
+    // create a Pathways object from the string
+    if(pathwayData.statusCode.equals(Constants.SUCCESS_CODE)){
+      pathway = parse(pathwayData.text).extract[PathwaySchemaDataModel]
+    }
+
+    pathway
   }
 
 

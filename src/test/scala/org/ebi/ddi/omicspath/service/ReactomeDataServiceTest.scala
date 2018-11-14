@@ -14,7 +14,6 @@ import org.junit.Assert._
 * */
 class ReactomeDataServiceTest extends TestCase {
 
-
   /*
   * variable with reactomedata service type
   *
@@ -43,7 +42,13 @@ class ReactomeDataServiceTest extends TestCase {
   *
   * */
   def testPathwaysPage(): Unit = {
-    println(reactomeDataService.getPathwaysPagesId("0","25")(0))
     assertNotNull(reactomeDataService.getPathwaysPagesId("0","25"))
+  }
+
+  /*
+  *test case to get single pathway data
+  * */
+  def testPathwaysSchema(): Unit ={
+    assertEquals(reactomeDataService.getPathwaysData("R-HSA-164843").stId,"R-HSA-164843")
   }
 }
