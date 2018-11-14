@@ -51,7 +51,9 @@ class ReactomeDataService extends DataService  {
     json
   }
 
-  def getPathwaysData(pathwayId:String):
+  def getPathwaysData(pathwayId:String)={
+  ""
+  }
 
 
 
