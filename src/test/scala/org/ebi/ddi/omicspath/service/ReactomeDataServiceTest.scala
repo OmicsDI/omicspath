@@ -43,7 +43,7 @@ class ReactomeDataServiceTest extends TestCase {
   *
   * */
   def testPathwaysPage(): Unit = {
-    println(reactomeDataService.getPathwaysPagesId("0","25"))
+    println(reactomeDataService.getPathwaysPagesId("0","25")(0))
     assertNotNull(reactomeDataService.getPathwaysPagesId("0","25"))
   }
 }
