@@ -16,5 +16,7 @@ object Constants  {
 
   val SUCCESS_CODE = 200
 
+  val REACTOME_DATABASE = "Reactome"
+
 
 }

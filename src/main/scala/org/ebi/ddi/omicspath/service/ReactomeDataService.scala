@@ -1,8 +1,12 @@
 package org.ebi.ddi.omicspath.service
 
 import java.text.SimpleDateFormat
+
+import com.thoughtworks.xstream.XStream
+import com.thoughtworks.xstream.io.xml.DomDriver
 import net.liftweb.json._
-import org.ebi.ddi.omicspath.model.{PathwayDataModel, PathwaySchemaDataModel}
+import org.ebi.ddi.omicspath.dbops.MongoOperation
+import org.ebi.ddi.omicspath.model.{Omicsdi, PathwayDataModel, PathwaySchemaDataModel, PathwaysAnalysis}
 import org.ebi.ddi.omicspath.utils.Constants
 
 
@@ -77,6 +81,33 @@ class ReactomeDataService extends DataService  {
     pathway
   }
 
+  /*
+  * generate xml from list of objects
+  *
+  * @param pathwaysList
+  * */
+  def getPathwaysXml(pathwaysList:Array[Omicsdi]): String ={
+    val xstream = new XStream(new DomDriver());
+    val xml = xstream.toXML(pathwaysList)
+    xml
+  }
+
+  def getOmicsdiFormat(pathwaySchemaDataModel: PathwaySchemaDataModel): Omicsdi ={
+
+    val omicsdiData = new Omicsdi(pathwaySchemaDataModel.stId,Constants.REACTOME_DATABASE, pathwaySchemaDataModel.displayName
+    ,pathwaySchemaDataModel.summation.text,Map("publication" -> Set(pathwaySchemaDataModel.releaseDate.toString)),
+      Map("omics_type"-> Set("Pathways"),"disease" -> Set(pathwaySchemaDataModel.disease.displayName),
+        "species" -> Set(pathwaySchemaDataModel.species.displayName))
+    )
+    omicsdiData
+  }
+
+  /*
+  * save omicsdi format data into mongodb
+  * */
+  def saveOmics(omicsdi: Omicsdi): Unit ={
+    MongoOperation.save(MongoOperation.buildMongoDbObject(omicsdi))
+  }
 
 
 }

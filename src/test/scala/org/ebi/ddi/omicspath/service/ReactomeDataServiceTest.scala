@@ -32,7 +32,7 @@ class ReactomeDataServiceTest extends TestCase {
   /*
   * test case to check counts of pathways if right or not
   * */
-  def testCount(): Unit ={
+  def testCount(): Unit = {
     assertEquals(reactomeDataService.getPathwaysCount(), "23520")
   }
 
@@ -48,7 +48,32 @@ class ReactomeDataServiceTest extends TestCase {
   /*
   *test case to get single pathway data
   * */
-  def testPathwaysSchema(): Unit ={
+  def testPathwaysSchema(): Unit = {
     assertEquals(reactomeDataService.getPathwaysData("R-HSA-164843").stId,"R-HSA-164843")
   }
+
+  /*
+  * test xml from pathways
+  * */
+  def testXmlGeneration(): Unit = {
+    println(reactomeDataService.getPathwaysXml(
+      Array(reactomeDataService.getOmicsdiFormat(reactomeDataService.getPathwaysData("R-HSA-164843")))))
+  }
+
+  /*
+  * test omicsdi insertion into mongodb
+  * */
+  def testOmicsInsertion(): Unit = {
+    val omicsdi = reactomeDataService.getOmicsdiFormat(reactomeDataService.getPathwaysData("R-HSA-164843"))
+    reactomeDataService.saveOmics(omicsdi)
+  }
+
+  /*
+  * test mongodb retrieval of records
+  * */
+  def testMongoRetrieval(): Unit = {
+    //reactomeDataService.
+  }
+
+
 }

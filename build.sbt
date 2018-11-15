@@ -11,7 +11,11 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %% "upickle" % "0.6.6",
   "net.liftweb" %% "lift-json" % "3.3.0",
   "io.circe" %% "circe-generic" % "0.1.0",
-  "org.json4s" %% "json4s-native" % "3.6.1"
+  "org.json4s" %% "json4s-native" % "3.6.1",
+  "com.thoughtworks.xstream" % "xstream" % "1.4.3",
+  "org.mongodb" %% "casbah" % "3.1.1",
+  "org.slf4j" % "slf4j-simple" % "1.6.4",
+  "com.novus" %% "salat-core" % "1.9.9" % Test
 )
 
-dependencyOverrides += "org.scala-lang" % "scala-compiler" % scalaVersion.value
+//dependencyOverrides += "org.scala-lang" % "scala-compiler" % scalaVersion.value
