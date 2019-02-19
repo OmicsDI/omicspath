@@ -23,6 +23,11 @@ case class PathwaySchemaDataModel(dbId: Int, displayName: String, stId: String, 
                                  )
 
 /*
+* associated pathways to molecules
+* */
+case class Pathways(stId: String, dbId:Int, name: String, species: AnalysisSpecies)
+
+/*
 * model for disease in pathways
 * */
 case class Disease(displayName:String)
@@ -31,6 +36,12 @@ case class Disease(displayName:String)
 * model for species in pathways
 * */
 case class Species(displayName:String)
+
+/*
+* species model for pathways of analysis service
+*
+* */
+case class AnalysisSpecies(name: String)
 
 /*
 * model for summation in pathways
@@ -48,7 +59,7 @@ case class Omicsdi(accession:String, database:String, name:String, description:S
 /*
 * model for get pathways analysis
 * */
-case class PathwaysAnalysis(identifiersNotFound:Int, pathwaysFound: Int )
+case class PathwaysAnalysis(identifiersNotFound:Int, pathwaysFound: Int, pathways: List[Pathways] )
 
 /*
 * model for crossreferences omicsdi
