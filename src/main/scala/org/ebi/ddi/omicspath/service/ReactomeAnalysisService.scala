@@ -23,7 +23,7 @@ class ReactomeAnalysisService extends AnalysisService {
   * */
   def getPathwaysAnalysis(moleculesList:String, pageSize:Int, pageNumber:Int): PathwaysAnalysis ={
 
-    val postData = moleculesList.replace("CHEBI:", "")
+    val postData = moleculesList.replace(Constants.CHEBI, "")
 
     var pathway:PathwaysAnalysis = null
 
