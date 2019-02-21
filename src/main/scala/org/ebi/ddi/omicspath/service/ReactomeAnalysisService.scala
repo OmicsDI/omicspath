@@ -24,9 +24,10 @@ class ReactomeAnalysisService extends AnalysisService {
   def getPathwaysAnalysis(moleculesList:String, pageSize:Int, pageNumber:Int): PathwaysAnalysis ={
 
     val postData = moleculesList.replace("CHEBI:", "")
+
     var pathway:PathwaysAnalysis = null
 
-    val pathwayUrl ="https://reactome.org/AnalysisService/identifiers/"
+    val pathwayUrl = Constants.PATHWAY_ANALYSIS_URL
 
     val pathwayData = requests.post(
       pathwayUrl,params = Map( "pageSize" -> pageSize.toString, "page" -> pageNumber.toString),
