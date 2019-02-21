@@ -20,5 +20,25 @@ object Constants  {
 
   val PATHWAY_ANALYSIS_URL = "https://reactome.org/AnalysisService/identifiers/"
 
+  val CHEBI = "CHEBI:"
+
+  val SERVER = "localhost"
+
+  val PORT   = 27017
+
+  val DATABASE = "ddi_db"
+
+  val COLLECTION = "datasets.dataset"
+
+  val DATE_FORMAT = "yyyy-MM-dd"
+
+  val ACCESSION_FIELD = "accession"
+
+  val DATABASE_FIELD = "database"
+
+  val CROSSREFERENCES_FIELD = "crossReferences"
+
+  
+
 
 }
