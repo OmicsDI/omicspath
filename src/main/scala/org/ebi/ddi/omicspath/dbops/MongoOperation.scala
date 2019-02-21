@@ -7,6 +7,8 @@ import com.mongodb.casbah.{Cursor, MongoClient, MongoClientURI, MongoConnection}
 import com.mongodb.casbah.commons.MongoDBObject
 import net.liftweb.json.{DefaultFormats, parse}
 import org.ebi.ddi.omicspath.model.{Crossreferences, Omicsdi, PathwaySchemaDataModel}
+import org.ebi.ddi.omicspath.utils.Constants
+
 import collection.JavaConverters._
 /*
 * class to perform mongo crud operations
@@ -14,22 +16,17 @@ import collection.JavaConverters._
 object MongoOperation extends Operation {
 
   implicit val formats = new DefaultFormats {
-    override def dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+    override def dateFormatter = new SimpleDateFormat(Constants.DATE_FORMAT)
   }
 
-  private val SERVER = "localhost"
-  private val PORT   = 27017
-  private val DATABASE = "ddi_db"
-  private val COLLECTION = "datasets.dataset"
 
-  val uri = MongoClientURI("mongodb://ddi_user:tDzDd81J@mongos-hxvm-001.ebi.ac.uk:27017/ddi_db?authSource=admin")
+
+  //val uri = MongoClientURI(Constants.DB_CONNECTION_STRING)
+  val uri = MongoClientURI(Constants.DB_CONNECTION_STRING)
   val mongoClient = MongoClient(uri)
-
-/*  val connection = MongoConnection("mongodb://ddi_user:tDzDd81J@mongos-hxvm-001.ebi.ac.uk:27017/admin")
-  val collection = connection(DATABASE)(COLLECTION)*/
-
-  val connection = mongoClient.getDB(DATABASE)
-  val collection = connection.getCollection(COLLECTION)
+  
+  val connection = mongoClient.getDB(Constants.DATABASE)
+  val collection = connection.getCollection(Constants.COLLECTION)
 
   def buildMongoDbObject(omicsdi: Omicsdi): DBObject = {
     val builder = MongoDBObject.newBuilder
@@ -53,33 +50,57 @@ object MongoOperation extends Operation {
   /*
   * get datasets which have molecules
   * */
-  def getDatasets():List[Crossreferences] ={
+  def getDatasets(pageNumber:Long, pageSize:Long):Set[Crossreferences] ={
 
     val moleculesDatasets = MongoDBObject("$or" -> Seq(
-      MongoDBObject("crossReferences.unipprot" -> MongoDBObject("$exists" -> true)),
+      MongoDBObject("crossReferences.uniprot" -> MongoDBObject("$exists" -> true)),
       MongoDBObject("crossReferences.ChEBI" -> MongoDBObject("$exists" -> true)),
       MongoDBObject("crossReferences.Ensembl" -> MongoDBObject("$exists" -> true)),
-      MongoDBObject("crossReferences.UniProt" -> MongoDBObject("$exists" -> true)))
+      MongoDBObject("crossReferences.UniProt" -> MongoDBObject("$exists" -> true)),
+      MongoDBObject("crossReferences.ensembl" -> MongoDBObject("$exists" -> true))
+      )
     )
 
-    val fields = MongoDBObject("accession" -> 1,"database"->1, "crossReferences"-> 1)
+    val fields = MongoDBObject("accession" -> 1,"database"->1,
+      "crossReferences.UniProt"-> 1,"crossReferences.ChEBI"-> 1, "crossReferences.Ensembl" -> 1,
+      "crossReferences.uniprot"-> 1,"crossReferences.chebi"-> 1, "crossReferences.ensembl" -> 1
+    )
 
-    //println(collection.findOne(moleculesDatasets,fields).get("crossReferences").toString)
-    val moleculeDataset = collection.find(moleculesDatasets,fields).limit(10)
+    var skipRecords = 1L
+    if(pageNumber != 0) skipRecords = pageNumber*pageSize
+    val moleculeDataset = collection.find(moleculesDatasets,fields).limit(pageSize.toInt).skip(skipRecords.toInt)
 
-    val testData = moleculeDataset.iterator().asScala.map(dt =>
-    {println(dt);
-       //println(parse(dt.get("crossReferences").toString));
-      Crossreferences(dt.get("accession").toString, dt.get("database").toString,
-        parse(dt.get("crossReferences").toString).values.asInstanceOf[Map[String, Set[String]]]) }).toList
+    val crossReference = moleculeDataset.iterator().asScala.map(dt =>
 
-    //val omicsdi:Iterator[Crossreferences] = (for (u <- moleculeDataset.iterator.asScala) yield parse(u.toString).extract[Crossreferences])
-    testData
-    //omicsdi
-/*    val omicsdi = parse(moleculeDataset.toString).extract[Crossreferences]
-    omicsdi*/
+      Crossreferences(dt.get(Constants.ACCESSION_FIELD).toString, dt.get("database").toString,
+        parse(dt.get("crossReferences").toString).values.asInstanceOf[Map[String, Set[String]]]) ).toSet
+
+    crossReference
+
+  }
+
+  /*
+  * update datasets with pathways list
+  * */
+  def setDatasetPathways(accession: String, database: String, pathways: Set[String]): Unit ={
+    collection.update(MongoDBObject("accession" -> accession, "database" -> database),
+      MongoDBObject("$set" -> MongoDBObject("additional.pathways" -> pathways)))
   }
 
 
+  /*
+  * get all datasets counts
+  * */
+  def getDatasetsCounts(): Long ={
+    val moleculesDatasets = MongoDBObject("$or" -> Seq(
+      MongoDBObject("crossReferences.uniprot" -> MongoDBObject("$exists" -> true)),
+      MongoDBObject("crossReferences.ChEBI" -> MongoDBObject("$exists" -> true)),
+      MongoDBObject("crossReferences.Ensembl" -> MongoDBObject("$exists" -> true)),
+      MongoDBObject("crossReferences.UniProt" -> MongoDBObject("$exists" -> true)),
+      MongoDBObject("crossReferences.ensembl" -> MongoDBObject("$exists" -> true))
+    )
+    )
+    collection.count(moleculesDatasets)
+  }
 
 }
