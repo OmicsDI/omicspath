@@ -18,5 +18,7 @@ object Constants  {
 
   val REACTOME_DATABASE = "Reactome"
 
+  val PATHWAY_ANALYSIS_URL = "https://reactome.org/AnalysisService/identifiers/"
+
 
 }
