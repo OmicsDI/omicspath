@@ -24,13 +24,13 @@ object MongoOperation extends Operation {
   //val uri = MongoClientURI(Constants.DB_CONNECTION_STRING)
   val uri = MongoClientURI(Constants.DB_CONNECTION_STRING)
   val mongoClient = MongoClient(uri)
-  
+
   val connection = mongoClient.getDB(Constants.DATABASE)
   val collection = connection.getCollection(Constants.COLLECTION)
 
   def buildMongoDbObject(omicsdi: Omicsdi): DBObject = {
     val builder = MongoDBObject.newBuilder
-    builder += "accession" -> omicsdi.accession
+    builder += Constants.ACCESSION_FIELD -> omicsdi.accession
     builder += "database" -> omicsdi.database
     builder += "name" -> omicsdi.name
     builder += "description" -> omicsdi.description
